@@ -13,12 +13,11 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::post('register', 'UserController@register');
-Route::post('login', 'UserController@authenticate');
-//Route::get('open', 'DataController@open');
+Route::post('auth/register', 'AuthController@register');
+Route::post('auth/login', 'AuthController@authenticate');
+Route::post('auth/refresh', 'AuthController@refresh');
 
 Route::group(['middleware' => ['jwt.verify']], function() {
-    Route::get('user', 'UserController@getAuthenticatedUser');
-    Route::get('closed', 'DataController@closed');
+    Route::get('auth/user', 'AuthController@getAuthenticatedUser');
     Route::resource('persona', 'PersonaController');
 });
