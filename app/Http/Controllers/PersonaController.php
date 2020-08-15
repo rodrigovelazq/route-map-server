@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Persona;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BaseController;
+use Illuminate\Support\Facades\Validator;
 
 class PersonaController extends BaseController
 {
@@ -16,7 +17,6 @@ class PersonaController extends BaseController
     public function index()
     {
         $personas = Persona::all();
-
         return $this->sendResponse($personas->toArray(), 'Personas recuperadas satisfactoriamente.');
     }
 
@@ -39,22 +39,14 @@ class PersonaController extends BaseController
     public function store(Request $request)
     {
         $input = $request->all();
-
-
         $validator = Validator::make($input, [
             'nombre' => 'required',
             'apellido' => 'required'
         ]);
-
-
         if($validator->fails()){
             return $this->sendError('Error en la validación.', $validator->errors());
         }
-
-
         $persona = Persona::create($input);
-
-
         return $this->sendResponse($persona->toArray(), 'Persona creada satisfactoriamente.');
     }
 
@@ -67,13 +59,9 @@ class PersonaController extends BaseController
     public function show($id)
     {
         $persona = Persona::find($id);
-
-
         if (is_null($persona)) {
             return $this->sendError('Persona no encontrada.');
         }
-
-
         return $this->sendResponse($persona->toArray(), 'Product recuperada successfully.');
     }
 
@@ -98,28 +86,20 @@ class PersonaController extends BaseController
     public function update(Request $request, Persona $persona)
     {
         $input = $request->all();
-
-
         $validator = Validator::make($input, [
             'nombre' => 'required',
             'apellido' => 'required'
         ]);
-
-
         if($validator->fails()){
             return $this->sendError('Error en la validación.', $validator->errors());
         }
-
-
         $persona->nombre = $input['nombre'];
         $persona->apellido = $input['apellido'];
-        $persona->ci = $input['ci'];
+        $persona->cedula = $input['cedula'];
         $persona->telefono = $input['telefono'];
         $persona->direccion = $input['direccion'];
         $persona->save();
-
-
-        return $this->sendResponse($persona->toArray(), 'Persona creada satisfactoriamente.');
+        return $this->sendResponse($persona->toArray(), 'Persona actualizada satisfactoriamente.');
     }
 
     /**
