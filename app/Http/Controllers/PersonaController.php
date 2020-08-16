@@ -6,6 +6,8 @@ use App\Persona;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BaseController;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Pagination\LengthAwarePaginator as Paginator;
+use App\Utils\PersistenceUtil;
 
 class PersonaController extends BaseController
 {
@@ -14,10 +16,10 @@ class PersonaController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $personas = Persona::all();
-        return $this->sendResponse($personas->toArray(), 'Personas recuperadas satisfactoriamente.');
+        $paginate = PersistenceUtil::getAllPaginate(Persona::class, $request);
+        return $this->sendResponse($paginate, 'Personas recuperadas satisfactoriamente.');
     }
 
     /**
@@ -33,7 +35,7 @@ class PersonaController extends BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -43,7 +45,7 @@ class PersonaController extends BaseController
             'nombre' => 'required',
             'apellido' => 'required'
         ]);
-        if($validator->fails()){
+        if ($validator->fails()) {
             return $this->sendError('Error en la validación.', $validator->errors());
         }
         $persona = Persona::create($input);
@@ -53,7 +55,7 @@ class PersonaController extends BaseController
     /**
      * Display the specified resource.
      *
-     * @param  \App\Persona  $persona
+     * @param \App\Persona $persona
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -68,7 +70,7 @@ class PersonaController extends BaseController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Persona  $persona
+     * @param \App\Persona $persona
      * @return \Illuminate\Http\Response
      */
     public function edit(Persona $persona)
@@ -79,8 +81,8 @@ class PersonaController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Persona  $persona
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Persona $persona
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Persona $persona)
@@ -90,7 +92,7 @@ class PersonaController extends BaseController
             'nombre' => 'required',
             'apellido' => 'required'
         ]);
-        if($validator->fails()){
+        if ($validator->fails()) {
             return $this->sendError('Error en la validación.', $validator->errors());
         }
         $persona->nombre = $input['nombre'];
@@ -105,7 +107,7 @@ class PersonaController extends BaseController
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Persona  $persona
+     * @param \App\Persona $persona
      * @return \Illuminate\Http\Response
      */
     public function destroy(Persona $persona)

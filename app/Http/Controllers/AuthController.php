@@ -23,8 +23,11 @@ class AuthController extends Controller
         } catch (JWTException $e) {
             return response()->json(['error' => 'could_not_create_token'], 500);
         }
-
-        return response()->json(compact('token'));
+        $user = User::where('name',$request->get('name'))->first();
+        return response()->json([
+            'token' => $token,
+            'user' => $user
+        ]);
     }
 
     public function register(Request $request)
@@ -77,10 +80,18 @@ class AuthController extends Controller
 
     public function refresh()
     {
-        $token = JWTAuth::refresh(JWTAuth::getToken());
-        $user = JWTAuth::setToken($token)->toUser();
-        //$request->headers->set('Authorization', 'Bearer ' . $refreshed);
-
+        try {
+            $token = JWTAuth::refresh(JWTAuth::getToken());
+            $user = JWTAuth::setToken($token)->toUser();
+        } catch (Exception $e) {
+            if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenBlacklistedException) {
+                return response()->json(['status' => $e->getMessage()], 401);
+            } else if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) {
+                return response()->json(['status' => $e->getMessage()], 401);
+            } else {
+                return response()->json(['status' => 'Authorization Token not found']);
+            }
+        }
         return response()->json(compact('token'));
     }
 }
