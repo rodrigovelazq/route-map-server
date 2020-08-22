@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Permiso;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -23,7 +24,15 @@ class AuthController extends Controller
         } catch (JWTException $e) {
             return response()->json(['error' => 'could_not_create_token'], 500);
         }
-        $user = User::where('name',$request->get('name'))->first();
+        $user = User::where('name', $request->get('name'))->first();
+        $permisos = Permiso::select('nombre')->join('rol_permiso', 'permiso.id', '=', 'rol_permiso.id_permiso')
+                ->join('rol_users', function ($q) use ($user) {
+                    $q->on('rol_users.id_rol', '=', 'rol_users.id_rol')
+                        ->where('rol_users.id_users', '=', $user->id);
+                })->get();
+
+        $user->permisos = $permisos;
+
         return response()->json([
             'token' => $token,
             'user' => $user
