@@ -20,4 +20,5 @@ Route::post('auth/refresh', 'AuthController@refresh');
 Route::group(['middleware' => ['jwt.verify']], function() {
     Route::get('auth/user', 'AuthController@getAuthenticatedUser');
     Route::resource('persona', 'PersonaController');
+    Route::post('getRoute', 'GmapController@getRoute');
 });
